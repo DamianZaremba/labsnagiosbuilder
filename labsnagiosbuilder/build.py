@@ -20,10 +20,6 @@ ldap_base_dn = "ou=hosts,dc=wikimedia,dc=org"
 ldap_filter = '(objectClass=dcobject)'
 ldap_attrs = ['puppetVar', 'puppetClass', 'dc', 'aRecord']
 
-# Template files we process with Jinja
-template_host_file = "/home/damian/rebuild/host.cfg"
-template_group_file = "/home/damian/rebuild/group.cfg"
-
 # Hostgroups we know of - projects get auto added here
 groups = {
     # Group name
