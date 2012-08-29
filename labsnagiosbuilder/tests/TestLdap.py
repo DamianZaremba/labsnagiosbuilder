@@ -44,14 +44,14 @@ class HostInfo(unittest.TestCase):
         }
 
     def test_groups1(self):
-        expected_groups = ['ssh', 'bots']
-        groups = build.get_host_groups(self.instance1)
-        self.assertEqual(groups, expected_groups)
+        expected_groups = set(['ssh', 'bots'])
+        groups = set(build.get_host_groups(self.instance1))
+        self.assertEqual(groups-expected_groups, [])
 
     def test_groups2(self):
-        expected_groups = ['ssh', 'bots', 'http']
-        groups = build.get_host_groups(self.instance2)
-        self.assertEqual(groups, expected_groups)
+        expected_groups = set(['ssh', 'bots', 'http'])
+        groups = set(build.get_host_groups(self.instance2))
+        self.assertEqual(groups-expected_groups, [])
 
     def test_get_puppet_vars1(self):
         expected_vars = {
