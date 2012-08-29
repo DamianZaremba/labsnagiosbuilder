@@ -63,7 +63,7 @@ class HostInfo(unittest.TestCase):
             'instancename': 'bots-cb-dev'
         }
         vars = build.get_puppet_vars(self.instance1)
-        self.assertEqual(expected_vars, vars)
+        self.assertEqual(sorted(expected_vars), sorted(vars))
 
     def test_get_puppet_vars2(self):
         expected_vars = {
@@ -75,7 +75,7 @@ class HostInfo(unittest.TestCase):
             'instancename': 'bots-cb-dev-test'
         }
         vars = build.get_puppet_vars(self.instance2)
-        self.assertEqual(expected_vars, vars)
+        self.assertEqual(sorted(expected_vars), sorted(vars))
 
     def test_host_info1(self):
         expected_host_info = {
@@ -98,7 +98,7 @@ class HostInfo(unittest.TestCase):
             'name': 'bots-cb-dev'
         }
         host_info = build.get_host_info(self.instance1)
-        self.assertEqual(expected_host_info, host_info)
+        self.assertEqual(sorted(expected_host_info), sorted(host_info))
 
     def test_host_info2(self):
         expected_host_info = {
@@ -122,4 +122,4 @@ class HostInfo(unittest.TestCase):
             'name': 'bots-cb-dev-test'
         }
         host_info = build.get_host_info(self.instance2)
-        self.assertEqual(expected_host_info, host_info)
+        self.assertEqual(sorted(expected_host_info), sorted(host_info))
