@@ -5,6 +5,8 @@ for them.
 
 Using a puppet classes to determine hostgroups and services to monitor.
 
+![](https://secure.travis-ci.org/damianzaremba/labsnagiosbuilder.png?branch=master)
+
 License
 =======
 This program is free software. It comes without any warranty, to
