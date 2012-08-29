@@ -10,6 +10,13 @@ and/or modify it under the terms of the Do What The Fuck You Want
 To Public License, Version 2, as published by Sam Hocevar. See
 http://sam.zoy.org/wtfpl/COPYING for more details.
 '''
+# Import modules we need
+import sys
+import os
+import ldap
+import logging
+import subprocess
+from jinja2 import Environment, PackageLoader
 
 # Where we dump the generated configs
 nagios_config_dir = "/etc/nagios3/conf.d"
@@ -46,14 +53,6 @@ groups = {
     },
 }
 
-# Import modules we need
-import sys
-import os
-import ldap
-import logging
-import subprocess
-from jinja2 import Environment, PackageLoader
-
 # Setup logging, everyone likes logging
 formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 stdout_handler = logging.StreamHandler(sys.stdout)
@@ -76,6 +75,7 @@ def get_ldap_config():
                 ldap_config[line_parts[0].strip()] = line_parts[1].strip()
 
     return ldap_config
+
 
 def ldap_connect():
     '''
@@ -102,6 +102,7 @@ def ldap_connect():
         logger.debug('Connected to ldap')
         return ldap_connection
 
+
 def ldap_disconnect(ldap_connection):
     '''
     Simple function to disconnect from ldap
@@ -112,6 +113,7 @@ def ldap_disconnect(ldap_connection):
         logger.error('Could not cleanly disconnect from LDAP')
     else:
         logger.debug('Disconnected from ldap')
+
 
 def get_host_groups(instance):
     '''
@@ -146,6 +148,7 @@ def get_host_groups(instance):
 
     return host_groups
 
+
 def get_puppet_vars(instance):
     '''
     Function to determine what puppet vars an instance has
@@ -160,6 +163,7 @@ def get_puppet_vars(instance):
             vars[k] = v
 
     return vars
+
 
 def get_host_info(instance):
     '''
@@ -176,6 +180,7 @@ def get_host_info(instance):
     info['puppet_classes'] = instance['puppetClass']
 
     return info
+
 
 def get_monitoring_info(ldap_connection):
     '''
@@ -209,6 +214,7 @@ def get_monitoring_info(ldap_connection):
 
     return hosts
 
+
 def write_nagios_configs(hosts):
     if not os.path.isdir(nagios_config_dir):
         os.makedirs(nagios_config_dir)
@@ -234,6 +240,7 @@ def write_nagios_configs(hosts):
 
     return True
 
+
 def clean_nagios(hosts):
     '''
     Simple function to remove old instances
@@ -256,6 +263,7 @@ def clean_nagios(hosts):
         logger.info('Removing %s' % file_path)
         os.unlink(file_path)
 
+
 def reload_nagios():
     '''
     Simple function to reload nagios
@@ -272,8 +280,8 @@ if __name__ == "__main__":
     # Fix the path to include our directory in the path
     # Needed for jinja2 to work
     sys.path.insert(0, os.path.dirname(
-                        os.path.dirname(
-                            os.path.abspath(__file__))))
+                    os.path.dirname(
+                        os.path.abspath(__file__))))
 
     # Connect
     ldap_connection = ldap_connect()
