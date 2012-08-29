@@ -11,7 +11,7 @@ class HostInfo(unittest.TestCase):
                 'instancecreator_username=DamianZaremba',
                 'instancecreator_lang=en',
                 'instanceproject=bots',
-                'instancename=bots-cb-dev'
+                'instancename=bots-cb'
             ],
             'aRecord': ['10.4.0.249'],
             'dc': ['i-000003d1'],
