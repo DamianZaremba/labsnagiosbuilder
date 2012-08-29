@@ -14,6 +14,9 @@ http://sam.zoy.org/wtfpl/COPYING for more details.
 # Where we dump the generated configs
 nagios_config_dir = "/etc/nagios3/conf.d"
 
+# How much to spam
+logging_level = logging.INFO
+
 # LDAP details
 ldap_config_file = "/etc/ldap.conf"
 ldap_base_dn = "ou=hosts,dc=wikimedia,dc=org"
@@ -56,7 +59,7 @@ formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(formatter)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging_level)
 logger.addHandler(stdout_handler)
 
 
