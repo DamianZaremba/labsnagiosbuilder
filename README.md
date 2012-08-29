@@ -5,7 +5,7 @@ for them.
 
 Using a puppet classes to determine hostgroups and services to monitor.
 
-![](https://secure.travis-ci.org/damianzaremba/labsnagiosbuilder.png?branch=master)
+![](https://secure.travis-ci.org/DamianZaremba/labsnagiosbuilder.png?branch=master)
 
 License
 =======
