@@ -1,0 +1,4 @@
+ldap
+jinja2
+nose
+flake8
