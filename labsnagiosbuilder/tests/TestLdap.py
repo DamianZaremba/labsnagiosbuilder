@@ -86,7 +86,6 @@ class HostInfo(unittest.TestCase):
                 'sudo::labs_project'
             ],
             'fqdn': 'i-000003d1',
-            'groups': ['bots', 'ssh'],
             'address': '10.4.0.249',
             'puppet_vars': {
                 'realm': 'labs',
@@ -110,7 +109,6 @@ class HostInfo(unittest.TestCase):
                 'webserver::apache2',
             ],
             'fqdn': 'i-000003d1',
-            'groups': ['bots', 'ssh'],
             'address': '10.4.0.249',
             'puppet_vars': {
                 'realm': 'labs',
