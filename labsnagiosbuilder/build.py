@@ -13,10 +13,15 @@ http://sam.zoy.org/wtfpl/COPYING for more details.
 # Import modules we need
 import sys
 import os
+import re
 import ldap
 import logging
 import subprocess
+from optparse import OptionParser
 from jinja2 import Environment, PackageLoader
+
+# Are we in debug mode?
+debug_mode = False
 
 # Where we dump the generated configs
 nagios_config_dir = "/etc/nagios3/conf.d"
@@ -26,9 +31,9 @@ logging_level = logging.INFO
 
 # LDAP details
 ldap_config_file = "/etc/ldap.conf"
-ldap_base_dn = "ou=hosts,dc=wikimedia,dc=org"
+ldap_base_dn = "dc=wikimedia,dc=org"
 ldap_filter = '(objectClass=dcobject)'
-ldap_attrs = ['puppetVar', 'puppetClass', 'dc', 'aRecord']
+ldap_attrs = ['puppetVar', 'puppetClass', 'dc', 'aRecord', 'associatedDomain']
 
 # Hostgroups we know of - projects get auto added here
 groups = {
@@ -115,7 +120,7 @@ def ldap_disconnect(ldap_connection):
         logger.debug('Disconnected from ldap')
 
 
-def get_host_groups(instance):
+def get_host_groups(instance, puppet_vars):
     '''
     Function to determine what groups an instance should belong to
     '''
@@ -123,7 +128,6 @@ def get_host_groups(instance):
     host_groups = []
 
     # Add it to the project group
-    puppet_vars = get_puppet_vars(instance)
     if 'instanceproject' in puppet_vars:
         project = puppet_vars['instanceproject']
         logger.debug('Added group %s for %s' % (project, instance['dc'][0]))
@@ -136,7 +140,7 @@ def get_host_groups(instance):
             }
         host_groups.append(project)
 
-    # Figure out stuff from puppet :)
+    # Figure out stuff from puppet classes :)
     if 'puppetClass' in instance.keys():
         for group in groups.keys():
             for puppet_class in instance['puppetClass']:
@@ -165,15 +169,24 @@ def get_puppet_vars(instance):
     return vars
 
 
-def get_host_info(instance):
+def get_host_info(instance, puppet_vars):
     '''
     Function to grab host info we need to build the definition
     '''
     logger.debug('Processing instance info for %s' % instance['dc'][0])
     info = {}
 
-    puppet_vars = get_puppet_vars(instance)
     info['fqdn'] = instance['dc'][0]
+    for domain in instance['associatedDomain']:
+        if domain.startswith(instance['dc'][0]):
+            info['fqdn'] = domain
+
+    info['uname'] = puppet_vars['instancename']
+    matches = re.match('dc=.+,dc=(.+),.+', instance['dc'][0])
+    if matches and matches.group(1):
+        info['uname'] = "%s-%s" % (matches.group(1),
+                                    puppet_vars['instancename'])
+
     info['name'] = puppet_vars['instancename']
     info['address'] = instance['aRecord'][0]
     info['puppet_vars'] = puppet_vars
@@ -197,28 +210,42 @@ def get_monitoring_info(ldap_connection):
     for (dn, instance) in results:
         logger.debug('Processing info for %s' % dn)
 
-        # We only care about instances
+        # Get puppet vars
+        puppet_vars = get_puppet_vars(instance)
+
+        # Get the dc - don't rely on this for anything other than
+        # being unique (used for file names etc)
         dc = instance['dc'][0]
-        if not dc.startswith('i-'):
+
+        # We only care about instances
+        if 'instancename' not in puppet_vars:
+            logger.debug('Skipping %s, not an instance' % dn)
             continue
 
-        # Sort out our groups
-        host_groups = get_host_groups(instance)
-        for group in host_groups:
-            logger.debug('Adding group %s for %s' % (group, dn))
-            groups[group]['hosts'].append(dc)
+        # If an instance doesn't have an ip it's probably building
+        ips = []
+        for ip in instance['aRecord']:
+            if len(ip.strip()) > 0:
+                ips.append(ip)
+
+        if len(ips) == 0:
+            logger.debug('Skipping %s, no ips' % dn)
+            continue
 
         # Sort out the host it's self
-        hosts[dc] = get_host_info(instance)
+        hosts[dc] = get_host_info(instance, puppet_vars)
+
+        # Sort out our groups
+        host_groups = get_host_groups(instance, puppet_vars)
+        for group in host_groups:
+            logger.debug('Adding group %s for %s' % (group, dn))
+            groups[group]['hosts'].append(hosts[dc]['fqdn'])
         hosts[dc]['groups'] = host_groups
 
     return hosts
 
 
 def write_nagios_configs(hosts):
-    if not os.path.isdir(nagios_config_dir):
-        os.makedirs(nagios_config_dir)
-
     jinja2_env = Environment(loader=PackageLoader('labsnagiosbuilder',
                                                     'templates'))
 
@@ -226,7 +253,7 @@ def write_nagios_configs(hosts):
     for group in groups.keys():
         file_path = os.path.join(nagios_config_dir, 'group-%s.cfg' % group)
         with open(file_path, 'w') as fh:
-            logger.info('Writing out group %s to %s' % (group, file_path))
+            logger.debug('Writing out group %s to %s' % (group, file_path))
             fh.write(template.render(group_name=group, group=groups[group]))
             fh.close()
 
@@ -234,10 +261,11 @@ def write_nagios_configs(hosts):
     for host in hosts.keys():
         file_path = os.path.join(nagios_config_dir, '%s.cfg' % host)
         with open(file_path, 'w') as fh:
-            logger.info('Writing out host %s to %s' % (host, file_path))
+            logger.debug('Writing out host %s to %s' % (host, file_path))
             fh.write(template.render(host=hosts[host]))
             fh.close()
 
+    logger.info('Dumped nagios configs')
     return True
 
 
@@ -277,6 +305,23 @@ def reload_nagios():
     return True
 
 if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option('-d', '--debug', action='store_true', dest='debug')
+    parser.add_option('--config-dir', dest='config_dir')
+
+    (options, args) = parser.parse_args()
+    if options.debug:
+        logger.setLevel(logging.DEBUG)
+        debug_mode = True
+
+    if options.config_dir:
+        nagios_config_dir = options.config_dir
+
+    if not os.path.isdir(nagios_config_dir) and \
+    not os.makedirs(nagios_config_dir):
+        logger.error('Could not create config dir')
+        sys.exit(2)
+
     # Fix the path to include our directory in the path
     # Needed for jinja2 to work
     sys.path.insert(0, os.path.dirname(
@@ -293,7 +338,10 @@ if __name__ == "__main__":
         # Write and exit
         if write_nagios_configs(hosts):
             clean_nagios(hosts)
-            if reload_nagios():
-                sys.exit(0)
+            if not debug_mode:
+                if reload_nagios():
+                    sys.exit(0)
+            else:
+                logger.debug('Skipping reload due to debug mode')
 
         sys.exit(1)

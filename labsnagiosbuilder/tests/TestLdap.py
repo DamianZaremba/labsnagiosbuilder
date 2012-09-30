@@ -13,6 +13,8 @@ class HostInfo(unittest.TestCase):
                 'instanceproject=bots',
                 'instancename=bots-cb-dev'
             ],
+            'uname': 'pmtpa-bots-cb-dev',
+            'associatedDomain': ['i-0000009e.pmtpa.wmflabs'],
             'aRecord': ['10.4.0.249'],
             'dc': ['i-000003d1'],
             'puppetClass': [
@@ -32,6 +34,8 @@ class HostInfo(unittest.TestCase):
                 'instanceproject=bots',
                 'instancename=bots-cb-dev-test'
             ],
+            'uname': 'pmtpa-bots-cb-test',
+            'associatedDomain': ['i-0000002d.pmtpa.wmflabs'],
             'aRecord': ['10.4.0.249'],
             'dc': ['i-000003d1'],
             'puppetClass': [
@@ -45,12 +49,14 @@ class HostInfo(unittest.TestCase):
 
     def test_groups1(self):
         expected_groups = ['ssh', 'bots']
-        groups = build.get_host_groups(self.instance1)
+        puppet_vars = build.get_puppet_vars(self.instance1)
+        groups = build.get_host_groups(self.instance1, puppet_vars)
         self.assertEqual(sorted(groups), sorted(expected_groups))
 
     def test_groups2(self):
         expected_groups = ['ssh', 'bots', 'http']
-        groups = build.get_host_groups(self.instance2)
+        puppet_vars = build.get_puppet_vars(self.instance2)
+        groups = build.get_host_groups(self.instance2, puppet_vars)
         self.assertEqual(sorted(groups), sorted(expected_groups))
 
     def test_get_puppet_vars1(self):
@@ -85,6 +91,7 @@ class HostInfo(unittest.TestCase):
                 'exim::simple-mail-sender',
                 'sudo::labs_project'
             ],
+            'uname': 'pmtpa-bots-cb-dev',
             'fqdn': 'i-000003d1',
             'address': '10.4.0.249',
             'puppet_vars': {
@@ -96,7 +103,8 @@ class HostInfo(unittest.TestCase):
             },
             'name': 'bots-cb-dev'
         }
-        host_info = build.get_host_info(self.instance1)
+        puppet_vars = build.get_puppet_vars(self.instance1)
+        host_info = build.get_host_info(self.instance1, puppet_vars)
         self.assertEqual(sorted(expected_host_info), sorted(host_info))
 
     def test_host_info2(self):
@@ -108,6 +116,7 @@ class HostInfo(unittest.TestCase):
                 'sudo::labs_project',
                 'webserver::apache2',
             ],
+            'uname': 'pmtpa-bots-cb-test',
             'fqdn': 'i-000003d1',
             'address': '10.4.0.249',
             'puppet_vars': {
@@ -119,5 +128,6 @@ class HostInfo(unittest.TestCase):
             },
             'name': 'bots-cb-dev-test'
         }
-        host_info = build.get_host_info(self.instance2)
+        puppet_vars = build.get_puppet_vars(self.instance2)
+        host_info = build.get_host_info(self.instance2, puppet_vars)
         self.assertEqual(sorted(expected_host_info), sorted(host_info))
