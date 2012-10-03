@@ -38,10 +38,11 @@ ignored_fqdns = [
     'i-0000038e.pmtpa.wmflabs',
     'i-000003c0.pmtpa.wmflabs',
     'i-000003e5.pmtpa.wmflabs',
-    'i-0000040b.pmtpa.wmflabs ',
+    'i-0000040b.pmtpa.wmflabs',
     'i-00000040c.pmtpa.wmflabs',
-    'i-00000469.pmtpa.wmflabs ',
+    'i-00000469.pmtpa.wmflabs',
     'i-0000049c.pmtpa.wmflabs',
+    'i-0000040c.pmtpa.wmflabs',
 ]
 
 # How much to spam
@@ -256,6 +257,7 @@ def get_monitoring_info(ldap_connection):
         # Check if we're ignoring this instance
         if hosts[dc]['fqdn'] in ignored_fqdns:
             del(hosts[dc])
+            logger.info('Skipping %s due to ignore' % dn)
             continue;
 
         # Sort out our groups
