@@ -26,6 +26,24 @@ debug_mode = False
 # Where we dump the generated configs
 nagios_config_dir = "/etc/nagios3/conf.d"
 
+# Instances to ignore
+ignored_fqdns = [
+    # Down in monitoring forever
+    'i-000000c1.pmtpa.wmflabs',
+    'i-000000e2.pmtpa.wmflabs',
+    'i-000000f8.pmtpa.wmflabs',
+    'i-00000118.pmtpa.wmflabs',
+    'i-000002dd.pmtpa.wmflabs',
+    'i-0000031c.pmtpa.wmflabs',
+    'i-0000038e.pmtpa.wmflabs',
+    'i-000003c0.pmtpa.wmflabs',
+    'i-000003e5.pmtpa.wmflabs',
+    'i-0000040b.pmtpa.wmflabs ',
+    'i-00000040c.pmtpa.wmflabs',
+    'i-00000469.pmtpa.wmflabs ',
+    'i-0000049c.pmtpa.wmflabs',
+]
+
 # How much to spam
 logging_level = logging.INFO
 
@@ -234,6 +252,11 @@ def get_monitoring_info(ldap_connection):
 
         # Sort out the host it's self
         hosts[dc] = get_host_info(instance, puppet_vars)
+
+        # Check if we're ignoring this instance
+        if hosts[dc]['fqdn'] in ignored_fqdns:
+            del(hosts[dc])
+            continue;
 
         # Sort out our groups
         host_groups = get_host_groups(instance, puppet_vars)
