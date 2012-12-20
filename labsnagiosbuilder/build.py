@@ -167,7 +167,8 @@ def get_host_groups(instance, puppet_vars):
         for group in groups.keys():
             for puppet_class in instance['puppetClass']:
                 if 'puppet' in groups[group] and \
-                puppet_class in groups[group]['puppet']:
+                    puppet_class in groups[group]['puppet']:
+
                     logger.debug('Added group %s for %s' %
                                     (puppet_class, instance['dc'][0]))
                     host_groups.append(group)
@@ -255,7 +256,7 @@ def get_monitoring_info(ldap_connection):
         if hosts[dc]['fqdn'] in ignored_fqdns:
             del(hosts[dc])
             logger.info('Skipping %s due to ignore' % dn)
-            continue;
+            continue
 
         # Sort out our groups
         host_groups = get_host_groups(instance, puppet_vars)
@@ -307,12 +308,12 @@ def clean_nagios(hosts):
 
         # Old instances
         if not cfg.startswith('group-') and \
-        cfg not in ok_hosts:
+            cfg not in ok_hosts:
             remove_files.append(file_path)
 
         # Old groups
         if cfg.startswith('group-') and \
-        cfg[6:] not in groups.keys():
+            cfg[6:] not in groups.keys():
             remove_files.append(file_path)
 
     for cfg in remove_files:
@@ -347,7 +348,7 @@ if __name__ == "__main__":
         nagios_config_dir = options.config_dir
 
     if not os.path.isdir(nagios_config_dir) and \
-    not os.makedirs(nagios_config_dir):
+        not os.makedirs(nagios_config_dir):
         logger.error('Could not create config dir')
         sys.exit(2)
 
