@@ -32,20 +32,15 @@ nagios_config_dir = "/etc/nagios3/conf.d"
 # Instances to ignore
 ignored_fqdns = [
     # Down in monitoring forever
-    'i-000000c1.pmtpa.wmflabs',
-    'i-000000e2.pmtpa.wmflabs',
-    'i-000000f8.pmtpa.wmflabs',
-    'i-00000118.pmtpa.wmflabs',
-    'i-000002dd.pmtpa.wmflabs',
-    'i-0000031c.pmtpa.wmflabs',
-    'i-0000038e.pmtpa.wmflabs',
-    'i-000003c0.pmtpa.wmflabs',
-    'i-000003e5.pmtpa.wmflabs',
-    'i-0000040b.pmtpa.wmflabs',
-    'i-00000040c.pmtpa.wmflabs',
-    'i-00000469.pmtpa.wmflabs',
-    'i-0000049c.pmtpa.wmflabs',
-    'i-0000040c.pmtpa.wmflabs',
+    'analytics.pmtpa.wmflabs',
+    'deployment-backup.pmtpa.wmflabs',
+    'deployment-feed.pmtpa.wmflabs',
+    'configtest-main.pmtpa.wmflabs',
+    'deployment-cache-bits02.pmtpa.wmflabs',
+    'conventionextension-test.pmtpa.wmflabs',
+    'wlm-apache1.pmtpa.wmflabs',
+    'utrsweb.pmtpa.wmflabs',
+    'wlm-mysql-master.pmtpa.wmflabs',
 ]
 
 # How much to spam

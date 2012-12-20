@@ -1,9 +1,9 @@
 Labs Nagios Builder
 ===================
-Simple python script to grab labs instances from ldap and build nagios configs
+Simple python script to grab labs instances from ldap and build Nagios configs
 for them.
 
-Using a puppet classes to determine hostgroups and services to monitor.
+Using a Puppet classes to determine hostgroups and services to monitor.
 
 ![http://travis-ci.org/#!/DamianZaremba/labsnagiosbuilder](https://secure.travis-ci.org/DamianZaremba/labsnagiosbuilder.png?branch=master)
 
