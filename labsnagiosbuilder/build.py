@@ -201,14 +201,8 @@ def get_host_info(instance, puppet_vars):
 
     info['fqdn'] = instance['dc'][0]
     for domain in instance['associatedDomain']:
-        if domain.startswith(instance['dc'][0]):
+        if domain.startswith(puppet_vars['instancename']):
             info['fqdn'] = domain
-
-    info['uname'] = puppet_vars['instancename']
-    matches = re.match('dc=.+,dc=(.+),.+', instance['dc'][0])
-    if matches and matches.group(1):
-        info['uname'] = "%s-%s" % (matches.group(1),
-                                    puppet_vars['instancename'])
 
     info['name'] = puppet_vars['instancename']
     info['address'] = instance['aRecord'][0]
