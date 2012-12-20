@@ -13,7 +13,6 @@ class HostInfo(unittest.TestCase):
                 'instanceproject=bots',
                 'instancename=bots-cb-dev'
             ],
-            'uname': 'pmtpa-bots-cb-dev',
             'associatedDomain': ['i-0000009e.pmtpa.wmflabs'],
             'aRecord': ['10.4.0.249'],
             'dc': ['i-000003d1'],
@@ -34,7 +33,6 @@ class HostInfo(unittest.TestCase):
                 'instanceproject=bots',
                 'instancename=bots-cb-dev-test'
             ],
-            'uname': 'pmtpa-bots-cb-test',
             'associatedDomain': ['i-0000002d.pmtpa.wmflabs'],
             'aRecord': ['10.4.0.249'],
             'dc': ['i-000003d1'],
@@ -91,7 +89,6 @@ class HostInfo(unittest.TestCase):
                 'exim::simple-mail-sender',
                 'sudo::labs_project'
             ],
-            'uname': 'pmtpa-bots-cb-dev',
             'fqdn': 'i-000003d1',
             'address': '10.4.0.249',
             'puppet_vars': {
@@ -116,7 +113,6 @@ class HostInfo(unittest.TestCase):
                 'sudo::labs_project',
                 'webserver::apache2',
             ],
-            'uname': 'pmtpa-bots-cb-test',
             'fqdn': 'i-000003d1',
             'address': '10.4.0.249',
             'puppet_vars': {
