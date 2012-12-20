@@ -17,7 +17,6 @@ GNU General Public License for more details.
 # Import modules we need
 import sys
 import os
-import re
 import ldap
 import logging
 import subprocess
@@ -282,7 +281,7 @@ def write_nagios_configs(hosts):
 
     template = jinja2_env.get_template('host.cfg')
     for host in hosts.keys():
-        file_path = os.path.join(nagios_config_dir, '%s.cfg' % host)
+        file_path = os.path.join(nagios_config_dir, '%s.cfg' % hosts[host]['fqdn'])
         with open(file_path, 'w') as fh:
             logger.debug('Writing out host %s to %s' % (host, file_path))
             fh.write(template.render(host=hosts[host]))
@@ -296,12 +295,19 @@ def clean_nagios(hosts):
     '''
     Simple function to remove old instances
     '''
+    ok_hosts = []
     remove_files = []
+
+    for host in hosts:
+        if hosts[host]['fqdn'] not in ok_hosts:
+            ok_hosts.append(hosts[host]['fqdn'])
+
     for file_path in os.listdir(nagios_config_dir):
         cfg = file_path[:-4]
 
         # Old instances
-        if cfg.startswith('i-') and cfg not in hosts.keys():
+        if not cfg.startswith('group-') and \
+        cfg not in ok_hosts:
             remove_files.append(file_path)
 
         # Old groups
