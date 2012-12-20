@@ -41,6 +41,10 @@ ignored_fqdns = [
     'wlm-apache1.pmtpa.wmflabs',
     'utrsweb.pmtpa.wmflabs',
     'wlm-mysql-master.pmtpa.wmflabs',
+    'bugzillatesting.pmtpa.wmflabs',
+    'fawikitest.pmtpa.wmflabs',
+    'home-migrate-lucid.pmtpa.wmflabs',
+    'nova-precise1.pmtpa.wmflabs',
 ]
 
 # How much to spam
