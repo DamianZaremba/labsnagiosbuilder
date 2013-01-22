@@ -45,6 +45,7 @@ ignored_fqdns = [
     'fawikitest.pmtpa.wmflabs',
     'home-migrate-lucid.pmtpa.wmflabs',
     'nova-precise1.pmtpa.wmflabs',
+    'labs-nfs1.pmtpa.wmflabs',
 ]
 
 # How much to spam
