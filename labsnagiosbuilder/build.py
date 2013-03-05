@@ -31,6 +31,15 @@ nagios_config_dir = "/etc/nagios3/conf.d"
 
 # Instances to ignore
 ignored_fqdns = [
+    # Suspended instances
+    'wikiversity-sandbox-frontend.pmtpa.wmflabs',
+    'metavidwiki.pmtpa.wmflabs',
+    'phabricator.pmtpa.wmflabs',
+    'centralauth-frontend.pmtpa.wmflabs',
+    'glam-gwtoolset-apt.pmtpa.wmflabs',
+    'resourceloader2-apache.pmtpa.wmflabs',
+    'blamemaps-m1xsmall.pmtpa.wmflabs',
+
     # Down in monitoring forever
     'analytics.pmtpa.wmflabs',
     'deployment-backup.pmtpa.wmflabs',
