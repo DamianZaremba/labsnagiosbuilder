@@ -270,9 +270,10 @@ def get_monitoring_info(ldap_connection):
         base_path = os.path.dirname(os.path.abspath(__file__))
         for pclass in hosts[dc]['puppet_classes']:
             pclass = '/'.join(pclass.split('::'))
-            mclass_file = os.path.abspath("%s.cfg" % os.path.join(base_path, 'templates', 'classes', pclass))
+            mclass_file = "%s.cfg" % os.path.join('templates', 'classes', pclass)
+            fmclass_file = os.path.abspath(base_path, mclass_file)
 
-            if not mclass_file.startswith(base_path):
+            if not fmclass_file.startswith(base_path):
                 logging.debug('Skipping %s as it looks dodgy' % mclass_file)
                 continue
 
