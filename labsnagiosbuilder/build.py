@@ -350,9 +350,9 @@ def reload_nagios():
     return True
 
 
-def load_groups():
+def load_groups(classes_path):
     config = ConfigParser.RawConfigParser()
-    config.read('classes.ini')
+    config.read(classes_path)
     for section in config.sections():
         short = config.get(section, 'short')
         if not short:
@@ -391,8 +391,10 @@ if __name__ == "__main__":
                         os.path.abspath(__file__))))
 
     # Load the group info
-    if os.path.isfile('classes.ini'):
-        load_groups()
+    classes_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                'classes.ini')
+    if os.path.isfile(classes_path):
+        load_groups(classes_path)
 
     # Connect
     ldap_connection = ldap_connect()
