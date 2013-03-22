@@ -68,17 +68,7 @@ ldap_filter = '(objectClass=dcobject)'
 ldap_attrs = ['puppetVar', 'puppetClass', 'dc', 'aRecord', 'associatedDomain']
 
 # Hostgroups we know of - projects get auto added here
-groups = {
-    # Group name
-    'ssh': {
-        # Group Description
-        'description': 'SSH servers',
-        # Hosts in group - we fill this in
-        'hosts': [],
-        # Puppet classes that cause hosts to be added to this group ;)
-        'puppet': ['base'],
-    },
-}
+groups = {}
 
 # Setup logging, everyone likes logging
 formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
