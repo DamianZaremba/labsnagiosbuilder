@@ -4,14 +4,10 @@ from labsnagiosbuilder import build
 
 class HostInfo(unittest.TestCase):
     def setUp(self):
-        self.groups = {
-            # Group name
+        build.groups = {
             'ssh': {
-                # Group Description
                 'description': 'SSH servers',
-                # Hosts in group - we fill this in
                 'hosts': [],
-                # Puppet classes that cause hosts to be added to this group ;)
                 'puppet': ['base'],
             },
             'http': {
