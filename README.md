@@ -7,6 +7,14 @@ Using a Puppet classes to determine hostgroups and services to monitor.
 
 ![http://travis-ci.org/#!/DamianZaremba/labsnagiosbuilder](https://secure.travis-ci.org/DamianZaremba/labsnagiosbuilder.png?branch=master)
 
+How to add a check
+==================
+* Create or modify the relevant role file
+* Provide any additional info in classes.ini
+
+Puppet classes map 1-1 with / replacing :: ie
+role::lucene::front_end::poolbeta -> templates/classes/role/lucene/front_end/poolbeta.cfg
+
 License
 =======
 This program is free software: you can redistribute it and/or modify
