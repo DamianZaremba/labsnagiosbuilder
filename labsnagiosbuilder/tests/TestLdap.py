@@ -4,6 +4,33 @@ from labsnagiosbuilder import build
 
 class HostInfo(unittest.TestCase):
     def setUp(self):
+        self.groups = {
+            # Group name
+            'ssh': {
+                # Group Description
+                'description': 'SSH servers',
+                # Hosts in group - we fill this in
+                'hosts': [],
+                # Puppet classes that cause hosts to be added to this group ;)
+                'puppet': ['base'],
+            },
+            'http': {
+                'description': 'HTTP servers',
+                'hosts': [],
+                'puppet': ['webserver::apache2'],
+            },
+            'mysql': {
+                'description': 'MySQL servers',
+                'hosts': [],
+                'puppet': ['role::labs-mysql-server'],
+            },
+            'lucene-frontend': {
+                'description': 'Lucene frontend servers',
+                'hosts': [],
+                'puppet': ['role::lucene::front-end', 'role::lucene::front_end::poolbeta']
+            },
+        }
+
         self.instance1 = {
             'puppetVar': [
                 'realm=labs',
