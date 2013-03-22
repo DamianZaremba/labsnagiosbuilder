@@ -277,7 +277,7 @@ def get_monitoring_info(ldap_connection):
                 logging.debug('Skipping %s as it looks dodgy' % mclass_file)
                 continue
 
-            if os.path.isfile(mclass_file):
+            if os.path.isfile(fmclass_file):
                 hosts[dc]['monitoring_class_files'].append(mclass_file)
 
     return hosts
