@@ -265,6 +265,20 @@ def get_monitoring_info(ldap_connection):
             groups[group]['hosts'].append(hosts[dc]['fqdn'])
         hosts[dc]['groups'] = host_groups
 
+        # Sort our monitoring classes out
+        hosts[dc]['monitoring_class_files'] = []
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        for pclass in hosts[dc]['puppet_classes']:
+            pclass = '/'.join(pclass.split('::'))
+            mclass_file = os.path.abspath("%s.cfg" % os.path.join(base_path, 'templates', 'classes', pclass))
+
+            if not mclass_file.startswith(base_path):
+                logging.debug('Skipping %s as it looks dodgy' % mclass_file)
+                continue
+
+            if os.path.isfile(mclass_file):
+                hosts[dc]['monitoring_class_files'].append(mclass_file)
+
     return hosts
 
 
@@ -333,6 +347,7 @@ def reload_nagios():
     logger.info('Reloading nagios')
     os.system('service nagios3 reload')
     return True
+
 
 def load_groups():
     config = ConfigParser.RawConfigParser()
