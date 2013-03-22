@@ -22,6 +22,7 @@ import logging
 import subprocess
 from optparse import OptionParser
 from jinja2 import Environment, PackageLoader
+import ConfigParser
 
 # Are we in debug mode?
 debug_mode = False
@@ -76,21 +77,6 @@ groups = {
         'hosts': [],
         # Puppet classes that cause hosts to be added to this group ;)
         'puppet': ['base'],
-    },
-    'http': {
-        'description': 'HTTP servers',
-        'hosts': [],
-        'puppet': ['webserver::apache2'],
-    },
-    'mysql': {
-        'description': 'MySQL servers',
-        'hosts': [],
-        'puppet': ['role::labs-mysql-server'],
-    },
-    'lucene-frontend': {
-        'description': 'Lucene frontend servers',
-        'hosts': [],
-        'puppet': ['role::lucene::front-end', 'role::lucene::front_end::poolbeta']
     },
 }
 
@@ -348,6 +334,22 @@ def reload_nagios():
     os.system('service nagios3 reload')
     return True
 
+def load_groups():
+    config = ConfigParser.RawConfigParser()
+    config.read('classes.ini')
+    for section in config.sections():
+        short = config.get(section, 'short')
+        if not short:
+            logger.debug('Skipping %s as no desc' % section)
+
+        if short not in groups.keys():
+            desc = config.get(section, 'desc')
+            if not desc:
+                logger.debug('Skipping %s as no desc' % section)
+
+            groups[short] = {'description': desc, 'hosts': [], 'puppet': []}
+        groups[short]['puppet'].append(section)
+
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('-d', '--debug', action='store_true', dest='debug')
@@ -371,6 +373,10 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(
                     os.path.dirname(
                         os.path.abspath(__file__))))
+
+    # Load the group info
+    if os.path.isfile('classes.ini'):
+        load_groups()
 
     # Connect
     ldap_connection = ldap_connect()
