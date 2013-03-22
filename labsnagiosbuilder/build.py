@@ -87,6 +87,11 @@ groups = {
         'hosts': [],
         'puppet': ['role::labs-mysql-server'],
     },
+    'lucene-frontend': {
+        'description': 'Lucene frontend servers',
+        'hosts': [],
+        'puppet': ['role::lucene::front-end', 'role::lucene::front_end::poolbeta']
+    },
 }
 
 # Setup logging, everyone likes logging
