@@ -112,7 +112,7 @@ def ldap_connect():
 
     try:
         ldap_connection.simple_bind_s(ldap_config['binddn'],
-                                    ldap_config['bindpw'])
+                                      ldap_config['bindpw'])
     except ldap.LDAPError:
         logger.error('Could not bind to LDAP')
     else:
@@ -156,11 +156,11 @@ def get_host_groups(instance, puppet_vars):
     if 'puppetClass' in instance.keys():
         for group in groups.keys():
             for puppet_class in instance['puppetClass']:
-                if 'puppet' in groups[group] and \
-                    puppet_class in groups[group]['puppet']:
+                if ('puppet' in groups[group] and puppet_class in
+                        groups[group]['puppet']):
 
-                    logger.debug('Added group %s for %s' %
-                                    (puppet_class, instance['dc'][0]))
+                    logger.debug('Added group %s for %s' % (
+                                 puppet_class, instance['dc'][0]))
                     host_groups.append(group)
 
     return host_groups
@@ -176,7 +176,7 @@ def get_puppet_vars(instance):
         for var in instance['puppetVar']:
             (k, v) = var.split('=', 1)
             logger.debug('Found puppet var %s for %s' %
-                            (k, instance['dc'][0]))
+                         (k, instance['dc'][0]))
             vars[k] = v
 
     return vars
@@ -210,7 +210,7 @@ def get_monitoring_info(ldap_connection):
 
     logger.debug('Searching ldap for hosts')
     results = ldap_connection.search_s(ldap_base_dn, ldap.SCOPE_SUBTREE,
-                                        ldap_filter, ldap_attrs)
+                                       ldap_filter, ldap_attrs)
     if not results:
         logger.error('Could not get the list of hosts from ldap')
 
@@ -261,7 +261,8 @@ def get_monitoring_info(ldap_connection):
         for pclass in hosts[dc]['puppet_classes']:
             pclass = '/'.join(pclass.split('::'))
             mclass_file = "%s.cfg" % os.path.join('classes', pclass)
-            fmclass_file = os.path.abspath(os.path.join(base_path, 'templates', mclass_file))
+            fmclass_file = os.path.abspath(os.path.join(
+                base_path, 'templates', mclass_file))
 
             if not fmclass_file.startswith(base_path):
                 logging.debug('Skipping %s as it looks dodgy' % mclass_file)
@@ -275,7 +276,7 @@ def get_monitoring_info(ldap_connection):
 
 def write_nagios_configs(hosts):
     jinja2_env = Environment(loader=PackageLoader('labsnagiosbuilder',
-                                                    'templates'))
+                                                  'templates'))
 
     template = jinja2_env.get_template('group.cfg')
     for group in groups.keys():
@@ -287,7 +288,8 @@ def write_nagios_configs(hosts):
 
     template = jinja2_env.get_template('host.cfg')
     for host in hosts.keys():
-        file_path = os.path.join(nagios_config_dir, '%s.cfg' % hosts[host]['fqdn'])
+        file_path = os.path.join(nagios_config_dir, '%s.cfg' %
+                                 hosts[host]['fqdn'])
         with open(file_path, 'w') as fh:
             logger.debug('Writing out host %s to %s' % (host, file_path))
             fh.write(template.render(host=hosts[host]))
@@ -312,13 +314,11 @@ def clean_nagios(hosts):
         cfg = file_path[:-4]
 
         # Old instances
-        if not cfg.startswith('group-') and \
-            cfg not in ok_hosts:
+        if not cfg.startswith('group-') and cfg not in ok_hosts:
             remove_files.append(file_path)
 
         # Old groups
-        if cfg.startswith('group-') and \
-            cfg[6:] not in groups.keys():
+        if cfg.startswith('group-') and cfg[6:] not in groups.keys():
             remove_files.append(file_path)
 
     for cfg in remove_files:
@@ -369,8 +369,8 @@ if __name__ == "__main__":
     if options.config_dir:
         nagios_config_dir = options.config_dir
 
-    if not os.path.isdir(nagios_config_dir) and \
-        not os.makedirs(nagios_config_dir):
+    if (not os.path.isdir(nagios_config_dir)
+            and not os.makedirs(nagios_config_dir)):
         logger.error('Could not create config dir')
         sys.exit(2)
 

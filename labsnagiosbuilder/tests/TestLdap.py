@@ -23,7 +23,10 @@ class HostInfo(unittest.TestCase):
             'lucene-frontend': {
                 'description': 'Lucene frontend servers',
                 'hosts': [],
-                'puppet': ['role::lucene::front-end', 'role::lucene::front_end::poolbeta']
+                'puppet': [
+                    'role::lucene::front-end',
+                    'role::lucene::front_end::poolbeta',
+                ],
             },
         }
 
