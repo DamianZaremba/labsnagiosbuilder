@@ -31,6 +31,7 @@ debug_mode = False
 nagios_config_dir = "/etc/nagios3/conf.d"
 
 # Instances to ignore
+'''
 ignored_fqdns = [
     # Suspended instances
     'wikiversity-sandbox-frontend.pmtpa.wmflabs',
@@ -57,6 +58,9 @@ ignored_fqdns = [
     'nova-precise1.pmtpa.wmflabs',
     'labs-nfs1.pmtpa.wmflabs',
 ]
+'''
+
+ignored_fqdns = [line.strip() for line in open('ignored.host')]
 
 # How much to spam
 logging_level = logging.INFO
@@ -280,6 +284,9 @@ def write_nagios_configs(hosts):
 
     template = jinja2_env.get_template('group.cfg')
     for group in groups.keys():
+        if len(groups[group]['hosts']) == 0:
+	    logger.info('Skipping group %s because it doesn\'t contain any hosts', group)
+	    continue
         file_path = os.path.join(nagios_config_dir, 'group-%s.cfg' % group)
         with open(file_path, 'w') as fh:
             logger.debug('Writing out group %s to %s' % (group, file_path))
@@ -303,7 +310,14 @@ def clean_nagios(hosts):
     '''
     Simple function to remove old instances
     '''
-    ok_hosts = []
+    ok_hosts = [ 'localhost_icinga',
+		 'services_icinga',
+		 'ido2db_check_proc',
+		 'hostgroups_icinga',
+		 'extinfo_icinga',
+		 'contacts_icinga',
+		 'timeperiods_icinga' ]
+
     remove_files = []
 
     for host in hosts:
@@ -314,7 +328,7 @@ def clean_nagios(hosts):
         cfg = file_path[:-4]
 
         # Old instances
-        if not cfg.startswith('group-') and cfg not in ok_hosts:
+        if not cfg.startswith('group-') and not cfg.startswith('generic') and cfg not in ok_hosts:
             remove_files.append(file_path)
 
         # Old groups
@@ -331,7 +345,7 @@ def reload_nagios():
     '''
     Simple function to reload nagios
     '''
-    if subprocess.call("nagios3 -v /etc/nagios3/nagios.cfg", shell=True) != 0:
+    if subprocess.call("icinga -v /etc/icinga/icinga.cfg", shell=True) != 0:
         logger.error('Nagios config validation failed')
         return
 
