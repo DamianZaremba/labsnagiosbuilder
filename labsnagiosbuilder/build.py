@@ -28,7 +28,7 @@ import ConfigParser
 debug_mode = False
 
 # Where we dump the generated configs
-nagios_config_dir = "/etc/nagios3/conf.d"
+nagios_config_dir = "/etc/icinga/objects"
 
 # Instances to ignore
 '''
@@ -350,7 +350,7 @@ def reload_nagios():
         return
 
     logger.info('Reloading nagios')
-    os.system('service nagios3 reload')
+    os.system('service icinga reload')
     return True
 
 
