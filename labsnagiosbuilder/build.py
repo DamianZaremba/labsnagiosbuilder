@@ -299,18 +299,25 @@ def clean_nagios(hosts):
     Simple function to remove old instances
     '''
     remove_files = []
+    ok_hosts = []
+    for host in hosts:
+        ok_hosts.append(hosts[host]['fqdn'])
 
     for file_path in os.listdir(nagios_config_dir):
         cfg = file_path[:-4]
 
-        # Old instances
-        if not cfg.startswith('instance-') and not cfg.startswith('generic') \
-                and cfg not in ok_files:
-            remove_files.append(file_path)
+        # Skip instance we still have
+        if cfg.startswith('instance-') and cfg[9:] in ok_hosts:
+            continue
 
-        # Old groups
-        if cfg.startswith('group-') and cfg[6:] not in groups.keys():
-            remove_files.append(file_path)
+        # Skip groups we still have
+        if cfg.startswith('group-') and cfg[6:] in groups.keys():
+            continue
+
+        if cfg.startswith('generic') or cfg in ok_files:
+            continue
+
+        remove_files.append(file_path)
 
     for cfg in remove_files:
         file_path = os.path.join(nagios_config_dir, cfg)
