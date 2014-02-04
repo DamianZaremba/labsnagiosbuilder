@@ -274,7 +274,7 @@ def write_nagios_configs(hosts):
     for group in groups.keys():
         if len(groups[group]['hosts']) == 0:
             logger.info('Skipping group %s (0 hosts)', group)
-        continue
+            continue
         file_path = os.path.join(nagios_config_dir, 'group-%s.cfg' % group)
         with open(file_path, 'w') as fh:
             logger.debug('Writing out group %s to %s' % (group, file_path))
