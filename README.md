@@ -7,13 +7,32 @@ Using a Puppet classes to determine hostgroups and services to monitor.
 
 ![http://travis-ci.org/#!/DamianZaremba/labsnagiosbuilder](https://secure.travis-ci.org/DamianZaremba/labsnagiosbuilder.png?branch=master)
 
+How to set this up?
+===================
+
+* Clone the git repo (over http) out onto the server, we keep it in /root/
+* Setup a crontab with the following (/etc/crontab)
+
+	*/5 * * * * root cd /root/nagios-builder/labsnagiosbuilder/ && (git reset --hard; git pull origin master; ./build.py --ignored-hosts=/root/nagios-builder/wmflabs-ignored.host >> /var/log/nagios.log 2>&1)
+
+* This will cause the repo to be reset, updated and then the build script run every 5min
+* All reloading etc of icinga will happen based on changes
+
+
 How to add a check
 ==================
+
 * Create or modify the relevant role file
 * Provide any additional info in classes.ini
 
 Puppet classes map 1-1 with / replacing :: ie
 role::lucene::front_end::poolbeta -> templates/classes/role/lucene/front_end/poolbeta.cfg
+
+How to ignore an instance
+=========================
+
+* Create an entry in wmflabs-ignored.hosts with the hostname to ignore
+* Use # or ; to add comments as to why
 
 License
 =======
