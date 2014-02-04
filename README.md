@@ -5,7 +5,7 @@ for them.
 
 Using a Puppet classes to determine hostgroups and services to monitor.
 
-![http://travis-ci.org/#!/DamianZaremba/labsnagiosbuilder](https://secure.travis-ci.org/DamianZaremba/labsnagiosbuilder.png?branch=master)
+[![travis-ci](https://travis-ci.org/DamianZaremba/labsnagiosbuilder.png)](http://travis-ci.org/#!/DamianZaremba/labsnagiosbuilder)
 
 How to set this up?
 ===================
