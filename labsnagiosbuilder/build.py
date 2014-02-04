@@ -31,39 +31,27 @@ debug_mode = False
 nagios_config_dir = "/etc/icinga/objects"
 
 # Instances to ignore
-'''
-ignored_fqdns = [
-    # Suspended instances
-    'wikiversity-sandbox-frontend.pmtpa.wmflabs',
-    'metavidwiki.pmtpa.wmflabs',
-    'phabricator.pmtpa.wmflabs',
-    'centralauth-frontend.pmtpa.wmflabs',
-    'glam-gwtoolset-apt.pmtpa.wmflabs',
-    'resourceloader2-apache.pmtpa.wmflabs',
-    'blamemaps-m1xsmall.pmtpa.wmflabs',
+ignored_fqdns = []
 
-    # Down in monitoring forever
-    'analytics.pmtpa.wmflabs',
-    'deployment-backup.pmtpa.wmflabs',
-    'deployment-feed.pmtpa.wmflabs',
-    'configtest-main.pmtpa.wmflabs',
-    'deployment-cache-bits02.pmtpa.wmflabs',
-    'conventionextension-test.pmtpa.wmflabs',
-    'wlm-apache1.pmtpa.wmflabs',
-    'utrsweb.pmtpa.wmflabs',
-    'wlm-mysql-master.pmtpa.wmflabs',
-    'bugzillatesting.pmtpa.wmflabs',
-    'fawikitest.pmtpa.wmflabs',
-    'home-migrate-lucid.pmtpa.wmflabs',
-    'nova-precise1.pmtpa.wmflabs',
-    'labs-nfs1.pmtpa.wmflabs',
-]
-'''
-
-ignored_fqdns = [line.strip() for line in open('ignored.host')]
+# Configs to ignore on cleanup
+ok_files = ['localhost_icinga',
+            'services_icinga',
+            'ido2db_check_proc',
+            'hostgroups_icinga',
+            'extinfo_icinga',
+            'contacts_icinga',
+            'timeperiods_icinga']
 
 # How much to spam
 logging_level = logging.INFO
+
+# Path to classes mapping file
+classes_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            'classes.ini')
+
+# Path to ignored hosts file
+ignored_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            'ignored.host')
 
 # LDAP details
 ldap_config_file = "/etc/ldap.conf"
@@ -285,8 +273,8 @@ def write_nagios_configs(hosts):
     template = jinja2_env.get_template('group.cfg')
     for group in groups.keys():
         if len(groups[group]['hosts']) == 0:
-	    logger.info('Skipping group %s because it doesn\'t contain any hosts', group)
-	    continue
+            logger.info('Skipping group %s (0 hosts)', group)
+        continue
         file_path = os.path.join(nagios_config_dir, 'group-%s.cfg' % group)
         with open(file_path, 'w') as fh:
             logger.debug('Writing out group %s to %s' % (group, file_path))
@@ -295,7 +283,7 @@ def write_nagios_configs(hosts):
 
     template = jinja2_env.get_template('host.cfg')
     for host in hosts.keys():
-        file_path = os.path.join(nagios_config_dir, '%s.cfg' %
+        file_path = os.path.join(nagios_config_dir, 'instance-%s.cfg' %
                                  hosts[host]['fqdn'])
         with open(file_path, 'w') as fh:
             logger.debug('Writing out host %s to %s' % (host, file_path))
@@ -310,25 +298,14 @@ def clean_nagios(hosts):
     '''
     Simple function to remove old instances
     '''
-    ok_hosts = [ 'localhost_icinga',
-		 'services_icinga',
-		 'ido2db_check_proc',
-		 'hostgroups_icinga',
-		 'extinfo_icinga',
-		 'contacts_icinga',
-		 'timeperiods_icinga' ]
-
     remove_files = []
-
-    for host in hosts:
-        if hosts[host]['fqdn'] not in ok_hosts:
-            ok_hosts.append(hosts[host]['fqdn'])
 
     for file_path in os.listdir(nagios_config_dir):
         cfg = file_path[:-4]
 
         # Old instances
-        if not cfg.startswith('group-') and not cfg.startswith('generic') and cfg not in ok_hosts:
+        if not cfg.startswith('instance-') and not cfg.startswith('generic') \
+                and cfg not in ok_files:
             remove_files.append(file_path)
 
         # Old groups
@@ -354,7 +331,33 @@ def reload_nagios():
     return True
 
 
+def load_ignored(classes_path):
+    '''
+    Loads the ignored hosts list from a file if it exists
+    '''
+    if os.path.isfile(ignored_path):
+        with open(ignored_path, 'r') as fh:
+            for line in fh.readlines():
+                line = line.strip()
+
+                # Ignore blank lines
+                if len(line) == 0:
+                    continue
+
+                # Ignore comments
+                if line.startswith('#') or line.startswith(';'):
+                    continue
+
+                ignored_fqdns.append(line)
+
+
 def load_groups(classes_path):
+    '''
+    Loads the classes mapping from a file if it exists
+    '''
+    if not os.path.isfile(classes_path):
+        return
+
     config = ConfigParser.RawConfigParser()
     config.read(classes_path)
     for section in config.sections():
@@ -370,10 +373,13 @@ def load_groups(classes_path):
             groups[short] = {'description': desc, 'hosts': [], 'puppet': []}
         groups[short]['puppet'].append(section)
 
+
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('-d', '--debug', action='store_true', dest='debug')
     parser.add_option('--config-dir', dest='config_dir')
+    parser.add_option('--ignored-hosts', dest='ignored_path')
+    parser.add_option('--class-mappings', dest='classes_path')
 
     (options, args) = parser.parse_args()
     if options.debug:
@@ -395,10 +401,10 @@ if __name__ == "__main__":
                         os.path.abspath(__file__))))
 
     # Load the group info
-    classes_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                'classes.ini')
-    if os.path.isfile(classes_path):
-        load_groups(classes_path)
+    load_groups(classes_path)
+
+    # Load the ignored info
+    load_ignored(ignored_path)
 
     # Connect
     ldap_connection = ldap_connect()
